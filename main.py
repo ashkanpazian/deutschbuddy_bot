@@ -8,12 +8,12 @@ from telegram.ext import (
 from openai import OpenAI
 from modules.onboarding import greet, handle_language_choice
 from modules.level_test import start_level_test, handle_answer
-from modules.menu import open_menu, set_goal
 from modules.schreiben import schreiben_correct
 from modules.wortschatz import vocab_daily
 from modules.dictionary import lookup
 from modules.grammar import grammar_tip
 from modules.menu import open_menu, set_goal, show_profile, handle_menu_action, handle_goal_set
+from modules.daily import daily, daily_check_answer
 
 logging.basicConfig(
     level=logging.INFO,
@@ -52,9 +52,15 @@ def main():
     app.add_handler(CommandHandler("wortschatz", vocab_daily))
     app.add_handler(CommandHandler("dict", lookup))
     app.add_handler(CommandHandler("grammar", grammar_tip))
+    app.add_handler(CommandHandler("daily", daily))
+
     # schreiben: any non-command text when user intends—keep simple demo with /schreiben context
+
     app.add_handler(CommandHandler("schreiben", lambda u,c: u.message.reply_text("متن آلمانی‌ات را بفرست تا تصحیح کنم.")))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, lambda u, c: daily_check_answer(u, c)))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, daily_check_answer))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, schreiben_correct))
+
     # callbacks
     app.add_handler(CallbackQueryHandler(handle_language_choice, pattern=r"^lang:(de|fa)$"))
     app.add_handler(CallbackQueryHandler(set_goal, pattern=r"^goal:(lernen|review)$"))
@@ -62,12 +68,13 @@ def main():
     app.add_handler(CallbackQueryHandler(level_cmd, pattern=r"^level:start$"))
     app.add_handler(CallbackQueryHandler(menu_cmd, pattern=r"^level:skip$"))
     app.add_handler(CallbackQueryHandler(show_profile, pattern=r"^menu:profile$"))
-    app.add_handler(CallbackQueryHandler(handle_menu_action, pattern=r"^menu:(schreiben|wortschatz|dict|grammar|back)$"))
     app.add_handler(CallbackQueryHandler(level_cmd, pattern=r"^level:start$"))
     app.add_handler(CallbackQueryHandler(menu_cmd, pattern=r"^level:skip$"))
     app.add_handler(CallbackQueryHandler(menu_cmd, pattern=r"^level:continue$"))
     app.add_handler(CallbackQueryHandler(level_cmd, pattern=r"^level:redo$"))
     app.add_handler(CallbackQueryHandler(handle_goal_set, pattern=r"^goal:set:(lernen|review)$"))
+    app.add_handler(
+        CallbackQueryHandler(handle_menu_action, pattern=r"^menu:(daily|schreiben|wortschatz|dict|grammar|back)$"))
 
     app.run_polling(close_loop=False)
 

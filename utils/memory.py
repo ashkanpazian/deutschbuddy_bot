@@ -12,7 +12,9 @@ default_state = {
         "schreiben": 0,
         "wortschatz": 0
     },
-    "seen_words": []         # لیست شناسه واژگان نشان‌داده‌شده برای جلوگیری از تکرار
+     "seen_words": [],
+    "last_daily": None,
+    "daily_streak": 0
 }
 
 def _load_all() -> Dict[str, Any]:

@@ -5,21 +5,25 @@ from utils.memory import set_user, get_user
 def main_menu(lang: str):
     if lang == "de":
         buttons = [
-            [InlineKeyboardButton("📝 Schreiben üben", callback_data="menu:schreiben"),
-             InlineKeyboardButton("📚 Wortschatz", callback_data="menu:wortschatz")],
-            [InlineKeyboardButton("🈳 Wörterbuch", callback_data="menu:dict"),
+            [InlineKeyboardButton("📅 Heutige Challenge", callback_data="menu:daily"),
+             InlineKeyboardButton("📝 Schreiben üben", callback_data="menu:schreiben")],
+            [InlineKeyboardButton("📚 Wortschatz", callback_data="menu:wortschatz"),
              InlineKeyboardButton("📖 Grammatik", callback_data="menu:grammar")],
+            [InlineKeyboardButton("🈳 Wörterbuch", callback_data="menu:dict")],
             [InlineKeyboardButton("👤 Profil", callback_data="menu:profile")]
+
         ]
         title = "Hauptmenü"
     else:
         buttons = [
-            [InlineKeyboardButton("📝 تمرین Schreiben", callback_data="menu:schreiben"),
-             InlineKeyboardButton("📚 واژگان", callback_data="menu:wortschatz")],
-            [InlineKeyboardButton("🈳 دیکشنری", callback_data="menu:dict"),
+            [InlineKeyboardButton("📅 تمرین امروز", callback_data="menu:daily"),
+             InlineKeyboardButton("📝 تمرین Schreiben", callback_data="menu:schreiben")],
+            [InlineKeyboardButton("📚 واژگان", callback_data="menu:wortschatz"),
              InlineKeyboardButton("📖 گرامر", callback_data="menu:grammar")],
+            [InlineKeyboardButton("🈳 دیکشنری", callback_data="menu:dict")],
             [InlineKeyboardButton("👤 پروفایل", callback_data="menu:profile")]
         ]
+
         title = "منوی اصلی"
     return title, InlineKeyboardMarkup(buttons)
 
@@ -119,6 +123,9 @@ async def handle_menu_action(update: Update, context: ContextTypes.DEFAULT_TYPE)
     elif action == "back":
         title, kb = main_menu(lang)
         await query.edit_message_text(text=title, reply_markup=kb)
+    elif action == "daily":
+        from modules.daily import daily
+        await daily(update, context)
 
     else:
         await query.edit_message_text("نام دستور منو ناشناخته است.")
