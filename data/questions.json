@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "question": "Wie heißt du?",
+    "options": [
+      "Ich bin gut.",
+      "Ich heiße Anna.",
+      "Mir geht’s gut.",
+      "Ich komme aus Berlin."
+    ],
+    "answer": 1,
+    "level": "A1"
+  },
+  {
+    "id": 2,
+    "question": "Was machst du am Wochenende?",
+    "options": [
+      "Ich esse ein Buch.",
+      "Ich schlafe und treffe Freunde.",
+      "Ich bin ein Auto.",
+      "Ich wohne Berlin."
+    ],
+    "answer": 1,
+    "level": "A2"
+  },
+  {
+    "id": 3,
+    "question": "Wählen Sie die korrekte Form: 'Ich _____ seit zwei Jahren Deutsch.'",
+    "options": [
+      "lerne",
+      "lernt",
+      "lernten",
+      "gelernt"
+    ],
+    "answer": 0,
+    "level": "B1"
+  },
+  {
+    "id": 4,
+    "question": "Welcher Satz ist grammatikalisch korrekt?",
+    "options": [
+      "Obwohl es regnet, ich gehe spazieren.",
+      "Ich gehe spazieren, obwohl es regnet.",
+      "Ich gehe, obwohl es regnet spazieren.",
+      "Obwohl regnet, gehe ich spazieren."
+    ],
+    "answer": 1,
+    "level": "B2"
+  }
+]
