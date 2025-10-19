@@ -32,14 +32,14 @@ def _mask(s: str) -> str:
     return (s[:6] + "..." + s[-4:]) if len(s) > 12 else "***"
 
 # ---------- Internal modules (بعد از load_dotenv) ----------
-from modules.onboarding import greet, handle_language_choice
+from modules.onboarding import greet, handle_language_choice, onboarding_quickstart
 from modules.level_test import start_level_test as level_start, handle_answer
-from modules.schreiben import schreiben_correct
-from modules.wortschatz import vocab_daily
-from modules.dictionary import lookup
-from modules.grammar import grammar_tip
-from modules.menu import open_menu, set_goal, show_profile, handle_menu_action, handle_goal_set
-from modules.daily import daily, daily_check_answer
+from modules.schreiben import schreiben_correct, schreiben_again
+from modules.wortschatz import vocab_daily, vocab_quiz_start, vocab_quiz_answer, vocab_quiz_again
+from modules.dictionary import lookup, dict_again
+from modules.grammar import grammar_tip, grammar_next, grammar_prev
+from modules.menu import open_menu, set_goal, show_profile, handle_menu_action
+from modules.daily import daily, daily_check_answer, daily_answer_callback, daily_again
 
 # ---------- Error handler ----------
 def on_error(update, context):
@@ -69,7 +69,7 @@ def build_app() -> Application:
         .build()
     )
 
-    # Commands
+    # Commands (group=0 پیش‌فرض)
     app.add_handler(CommandHandler("start", greet))
     app.add_handler(CommandHandler("menu", open_menu))
     app.add_handler(CommandHandler("level", level_start))
@@ -77,21 +77,42 @@ def build_app() -> Application:
     app.add_handler(CommandHandler("dict", lookup))
     app.add_handler(CommandHandler("grammar", grammar_tip))
     app.add_handler(CommandHandler("daily", daily))
-    app.add_handler(CommandHandler("schreiben", lambda u, c: u.message.reply_text("متن آلمانی‌ات را بفرست تا تصحیح کنم.")))
+    app.add_handler(
+        CommandHandler("schreiben", lambda u, c: u.message.reply_text("متن آلمانی‌ات را بفرست تا تصحیح کنم.")))
 
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, daily_check_answer))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, schreiben_correct))
-
+    # Callback answers / specific callbacks (قرار بده قبل از الگوی کلی منو)
+    app.add_handler(CallbackQueryHandler(daily_answer_callback, pattern=r"^daily:opt:\d+$"))
+    app.add_handler(CallbackQueryHandler(grammar_next, pattern=r"^grammar:next$"))
+    app.add_handler(CallbackQueryHandler(grammar_prev, pattern=r"^grammar:prev$"))
     app.add_handler(CallbackQueryHandler(handle_language_choice, pattern=r"^lang:(de|fa)$"))
     app.add_handler(CallbackQueryHandler(set_goal, pattern=r"^goal:(lernen|review)$"))
-    app.add_handler(CallbackQueryHandler(handle_goal_set, pattern=r"^goal:set:(lernen|review)$"))
     app.add_handler(CallbackQueryHandler(handle_answer, pattern=r"^ans:\d+:\d+$"))
     app.add_handler(CallbackQueryHandler(level_start, pattern=r"^level:start$"))
-    app.add_handler(CallbackQueryHandler(open_menu,   pattern=r"^level:skip$"))
-    app.add_handler(CallbackQueryHandler(open_menu,   pattern=r"^level:continue$"))
+    app.add_handler(CallbackQueryHandler(open_menu, pattern=r"^level:skip$"))
+    app.add_handler(CallbackQueryHandler(open_menu, pattern=r"^level:continue$"))
     app.add_handler(CallbackQueryHandler(level_start, pattern=r"^level:redo$"))
     app.add_handler(CallbackQueryHandler(show_profile, pattern=r"^menu:profile$"))
-    app.add_handler(CallbackQueryHandler(handle_menu_action, pattern=r"^menu:(daily|schreiben|wortschatz|dict|grammar|back)$"))
+    # Wortschatz callbacks
+    app.add_handler(CallbackQueryHandler(vocab_quiz_start, pattern=r"^vocab:quiz:start$"))
+    app.add_handler(CallbackQueryHandler(vocab_quiz_answer, pattern=r"^vocab:quiz:opt:\d+$"))
+    app.add_handler(CallbackQueryHandler(vocab_quiz_again, pattern=r"^vocab:again$"))
+    app.add_handler(CallbackQueryHandler(onboarding_quickstart, pattern=r"^onboard:start$"))
+    app.add_handler(CallbackQueryHandler(schreiben_again, pattern=r"^schreiben:again$"))
+    app.add_handler(CallbackQueryHandler(dict_again, pattern=r"^dict:again$"))
+    app.add_handler(CallbackQueryHandler(daily_again, pattern=r"^daily:again$"))
+
+    # در نهایت: هندلر کلی منو (باید آخرِ کالبک‌ها باشد)
+
+    app.add_handler(CallbackQueryHandler(handle_menu_action,
+                                                    pattern=r"^menu:(daily|schreiben|wortschatz|dict|grammar|profile|back)$"))
+
+    # Message handlers — ترتیب مهم است!
+    # 1) پاسخ تمرین روزانه (GAP) باید قبل از هر متن دیگری بررسی شود
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, daily_check_answer), group=1)
+    # 2) عکس برای Schreiben
+    app.add_handler(MessageHandler(filters.PHOTO, schreiben_correct), group=2)
+    # 3) متن آزاد برای Schreiben (اگر daily نبود)
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, schreiben_correct), group=3)
 
     app.add_error_handler(on_error)
     return app

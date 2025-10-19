@@ -2,8 +2,23 @@
   "110419791": {
     "language": "fa",
     "level": "B2",
-    "goal": "review",
-    "last_daily": "2025-10-18",
-    "daily_streak": 1
+    "goal": "lernen",
+    "progress": {
+      "schreiben": 0,
+      "wortschatz": 0
+    },
+    "seen_words": [
+      "verlässlich",
+      "umweltfreundlich"
+    ],
+    "last_daily": "2025-10-19",
+    "daily_streak": 1,
+    "grammar_progress": {
+      "level": null,
+      "index": 0,
+      "history": []
+    },
+    "last_activity": "2025-10-19T10:18:39.969697",
+    "last_context": "grammar"
   }
 }

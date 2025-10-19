@@ -14,7 +14,8 @@ default_state = {
     },
      "seen_words": [],
     "last_daily": None,
-    "daily_streak": 0
+    "daily_streak": 0,
+    "grammar_progress": {"level": None, "index": 0, "history": []}
 }
 
 def _load_all() -> Dict[str, Any]:
