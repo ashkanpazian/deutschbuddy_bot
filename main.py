@@ -32,7 +32,7 @@ if not TELEGRAM_BOT_TOKEN or not OPENAI_API_KEY:
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def start(update: Update, context: ContextTypes.DEFAlULT_TYPE):
     await greet(update, context)
 
 async def level_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
